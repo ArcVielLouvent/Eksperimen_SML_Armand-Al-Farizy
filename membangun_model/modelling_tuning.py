@@ -13,8 +13,17 @@ REPO_NAME = "Experiment_SML_Armand-Al-Farizy"
 dagshub.init(repo_owner=REPO_OWNER, repo_name=REPO_NAME, mlflow=True)
 
 df = pd.read_csv('../preprocessing/dataset_preprocessing/data_clean.csv')
-features = df.select_dtypes(include='number').columns.tolist()
-target = features.pop()
+
+numeric_cols = df.select_dtypes(include='number').columns.tolist()
+
+if 'Survived' in numeric_cols:
+    target = 'Survived'
+    numeric_cols.remove('Survived')
+    features = numeric_cols
+else:
+    target = numeric_cols[-1]
+    features = numeric_cols[:-1]
+    df[target] = (df[target] > df[target].mean()).astype(int)
 
 X = df[features]
 y = df[target]
